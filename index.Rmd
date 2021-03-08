@@ -1,36 +1,58 @@
 ---
-title: "Untitled"
+title: "Oregon Child Abuse Prevalence Study"
+subtitle: "Pilot"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
+    theme: united
+    source_code: embed
     vertical_layout: fill
+    horizontal_layout: fill
 ---
+
+
+<style type="text/css">
+
+.chart-title {  /* chart_title  */
+   font-size: 15px;
+   font-family: font-family: 'Sen', sans-serif;
+
+</style>
+
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
 ```
 
-Column {data-width=650}
------------------------------------------------------------------------
+Data Description {.sidebar}
+=============================
 
-### Chart A
+**Data Source**
 
-```{r}
+The plots and statistics displayed on this dashboard are generated from the Oregon Child Abuse Prevalence Study (OCAPS) Pilot, conducted with 216 high schoolers in 5 Lane County (OR) school districts in 2019.
 
-```
+**The OCAPS pilot surveys students to assess students' current experiences of abuse, harrassment, and social support.**
 
-Column {data-width=350}
------------------------------------------------------------------------
+[Akhila Nekkanti](https://ctn.uoregon.edu/profile/akhilan) created this dashboard in R using the [flexdashboard](https://rmarkdown.rstudio.com/flexdashboard/index.html) package.
 
-### Chart B
+Home {data-orientation=rows} 
+=========================
 
-```{r}
 
-```
+Row 
+----------------------------------------------
 
-### Chart C
+### Click the image below to learn more about the Oregon Child Abuse Prevalence Study Pilot, conducted by the University of Oregon's Center for Prevention of Abuse and Neglect. {.no-title}
 
-```{r}
+[![](https://90by30.com/sites/90by30.com/files/uploads/Facebook%20-%20Know%20More.png)](https://90by30.com/sites/90by30.com/files/resources/OCAPS%20Pilot%2010%20page%20Research%20Summary.pdf){target="_blank"}
 
-```
 
+
+Row {data-height=650}
+-------------------------------
+### Background
+
+**The Oregon Child Abuse Prevalence Study (OCAPS)** was designed to much more accurately measure the rates of child abuse and neglect in Oregon. Until now, Oregon has relied almost exclusively on a handful of questions in surveys and on reports to child protective services to estimate abuse and neglect rates.
+
+Policymakers, funders, advocates and people working to support children and families overwhelmingly agree that the best **existing measurement significantly under-reports the actual abuse and neglect experienced by Oregon children and youth**. 
+
+There is a need for a better, more accurate approach. The [UO Center for the Prevention of Abuse and Neglect](https://90by30.com/who-we-are/center-prevention-abuse-and-neglect) spent two years researching how other states and countries measure child abuse prevalence rates and then another year in developing and implementing a pilot study to determine whether a safe and more accurate method could work in Oregon. The Ford Family Foundation and Meyer Memorial Trust supported the research, development, and piloting stages of OCAPS. The CPAN research team has now completed an OCAPS pilot study and we are now before the Oregon Legislature, partnering with the Department of Human Services and Oregon Department of Education to fund OCAPS statewide. To investigate whether such a study is viable, several legislators in 2017 recommended that CPAN pilot the study and bring those results to the Legislature. This report is the result of those efforts. 
