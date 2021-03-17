@@ -72,15 +72,15 @@ dq1 <- dq1 %>%
 What is OCAPS?
 =============================
 
-Column {data-width=400}
+Column
 ----------------------------------------------
 
 ### Click the image below to learn more about the Oregon Child Abuse Prevalence Study Pilot, conducted by the University of Oregon's Center for Prevention of Abuse and Neglect. {.no-title}
 
-[![](grad.png)](https://olis.oregonlegislature.gov/liz/2020R1/Downloads/CommitteeMeetingDocument/211979) {fig.width=5px}
+[![](grad.png)](https://olis.oregonlegislature.gov/liz/2020R1/Downloads/CommitteeMeetingDocument/211979)
 
 
-Column
+Column {data-width=700}
 -------------------------------
 ### Background
 
@@ -96,7 +96,7 @@ What are students saying? {.storyboard}
 =============================
 
 
-### **64%** of students report at least one experience of physical abuse. Abuse experiences may be related to missing school.{data-commentary-width=600}
+### **64%** of students report at least one experience of physical abuse. Absenteeism but not grades are related to students' experience of abuse. {data-commentary-width=600}
 ```{r}
 
 colors <- c("#FFDB6D", "#C4961A", "#F4EDCA", 
@@ -180,7 +180,7 @@ ggplot(aes(Q18, fill = loc)) +
          legend.title = element_blank(),
          legend.text = element_text(size = 5)) +
   labs(
-    title = str_wrap("Of those who experience at least one type of abuse, 88% missed school", width = 45))
+    title = str_wrap("Of those who experience at least one type of abuse, 88% missed school", width = 55))
 
 # d <- d %>% 
 #   mutate(Q87A = factor)
@@ -262,8 +262,6 @@ x <- x %>%
 ```
 
 ***
-
-Chronic absenteeism is a serious concern for Oregon, and increases students' risk of dropping out from high school. A deeper, more accurate understanding of what might be causing absenteeism and drop out can help inform policy that supports students' outside of school. 
 
 
 ```{r}
@@ -457,7 +455,7 @@ labs(title = str_wrap("Of the students who experienced at least one type of abus
 
 ### Students are most likely to disclose their expereinces to their friends, regardless of Urban or Rural school status.
 
-```{r}
+```{r fig.width=5, fig.height=5}
 
 radar <- d %>% 
   group_by(loc) %>% 
@@ -497,7 +495,8 @@ radar <- radar %>%
     names_to = "toss",
     values_to = "told",
     values_drop_na = TRUE
-)
+) %>% 
+  mutate(told = str_wrap(told, width = 10))
 
 
 ggplot(radar, aes(x = told)) +
@@ -506,7 +505,7 @@ ggplot(radar, aes(x = told)) +
   scale_fill_manual(values = c("darkseagreen1", "darkseagreen4")) +
   #scale_x_discrete(labels = wrap_format(10)) +
   labs(title = "Students are Most Likely to Disclose to Friends",
-       subtitle = "Regardless of Foster Care Placement",
+       subtitle = "Regardless of Urban or Rural School Location",
        y = NULL,
        x = NULL,
        fill = NULL) +
