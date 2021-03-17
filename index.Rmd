@@ -95,11 +95,8 @@ There is a need for a better, more accurate approach. The [UO Center for the Pre
 What are students saying? {.storyboard}
 =============================
 
-### **64%** of students report at least one experience of physical abuse.{data-commentary-width=600}
 
-
-
-### Abuse experiences may be related to missing school.{data-commentary-width=600}
+### **64%** of students report at least one experience of physical abuse. Abuse experiences may be related to missing school.{data-commentary-width=600}
 ```{r}
 
 colors <- c("#FFDB6D", "#C4961A", "#F4EDCA", 
@@ -266,21 +263,27 @@ x <- x %>%
 
 ***
 
+Chronic absenteeism is a serious concern for Oregon, and increases students' risk of dropping out from high school. A deeper, more accurate understanding of what might be causing absenteeism and drop out can help inform policy that supports students' outside of school. 
+
+
 ```{r}
 
 ggpubr::ggballoonplot(school1, fill = "value") + ggplot2::scale_fill_gradient(low = "yellow", high = "red") +
-  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45),
+        legend.position = "none")+
   labs(
-    title= str_wrap("Overall, absences aren't related to student reported grades", width=30)
+    title= str_wrap("Overall, absences aren't related to student reported grades", width=30),
+    subtitle = "Larger circles indicate more students.",
+    y = "Missed Days of School",
+    x = "Grades"
   )
 
 ```
 
 
+### Most students who have experienced at least one type of abuse report that their parents are engaged and present.
 
-### 
-
-```{r}
+```{r fig.width=12, fig.height=5}
 
 liklevel <- c('Never', 'Almost Never', 'Sometimes', 'A lot', 'I choose not to answer')
 
@@ -351,7 +354,7 @@ parent_liklong <- parent_lik %>%
  sum_table <- parent_liklong %>%
   filter(category != "I choose not to answer") %>% 
   select(question, n, category) %>% 
-   mutate(question = stringr::str_wrap(question, width = 35)) %>% 
+   #mutate(question = stringr::str_wrap(question, width = 50)) %>% 
   group_by(question) %>%
   mutate(total = sum(n)) %>% 
   ungroup() %>% 
@@ -388,9 +391,9 @@ ggplot(aes(question, pct)) +
                color = "grey40",
                linetype = 2) +
   ylim(-0.25, 1) +
-  labs(title = str_wrap("Students Report on their Parents' Engagement", width = 30),
+  labs(title = str_wrap("Students Report on their Parents' Engagement", width = 50),
         y = NULL,
-        subtitle = str_wrap("Among those who experienced at least one type of physical abuse, many report their parents are engaging and present.", width = 40)
+        subtitle = str_wrap("Among those who experienced at least one type of physical abuse, many report their parents are engaging and present.", width = 50)
   ) +
   theme(
          plot.title = element_text(size = 15),
@@ -404,37 +407,55 @@ ggplot(aes(question, pct)) +
          axis.ticks.x=element_blank(),
          legend.position = "bottom",
          legend.title = element_blank(),
-         legend.text = element_text(size = 10),
-         aspect.ratio = 8/10)
+         legend.text = element_text(size = 10))
   
 
 ```
 
-***
 
-
-### Mental Health
+### Students who have experienced abuse are at risk for severe depression.{data-commentary-width=550}
 
 ```{r}
 
-dq %>% 
+dq1 %>% 
+  filter(pa >=1) %>% 
+  filter(Q56 != "I choose not to answer") %>% 
   ggplot(aes(as.factor(Q56))) +
-  geom_bar() +
-  facet_grid(~age) +
-  labs(
-    title = "Suicidality in the past 12 months")
-
-dq %>% 
-  ggplot(aes(as.factor(Q55))) +
-  geom_bar() +
-  facet_grid(~age) +
-  labs(title = "Depressed")
+  geom_bar(aes(fill = loc)) +
+  geom_text(stat = 'count', aes(label = ..count..), vjust =1, size = 3, color = "white") +
+  facet_wrap(~loc) +
+  labs(title = str_wrap("Of the students who experienced at least one type of abuse, those in urban schools are more likely to have considered suicide.", width = 50),
+       y = "Number of Students",
+       x = "Have Students Considered Suicidality?") +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = "none",
+        panel.background = element_blank()) +
+  scale_fill_manual(values = c("tomato1", "tomato4")) 
 
 ```
 
 ***
+```{r}
+dq1 %>% 
+  filter(pa >= 1) %>% 
+  filter(Q55 != "I choose not to answer") %>% 
+  ggplot(aes(as.factor(Q55))) +
+  geom_bar(aes(fill = loc)) +
+    geom_text(stat = 'count', aes(label = ..count..), vjust =1, size = 3, color = "white") +
+  facet_grid(~loc) +
+labs(title = str_wrap("Of the students who experienced at least one type of abuse, those in urban schools are more likely to feel depressed.", width = 50),
+       y = "Number of Students",
+       x = "Are Students Depressed?") +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = "none",
+        panel.background = element_blank()) +
+  scale_fill_manual(values = c("goldenrod2", "goldenrod4")) 
 
-### School {data-commentary-width=400}
+```
+
+
+
+### Students are most likely to disclose their expereinces to their friends, regardless of Urban or Rural school status.
 
 ```{r}
 
@@ -450,16 +471,16 @@ radar <- d %>%
 radar$Q163_1 <- recode_factor(radar$Q163_1, "1" = "Teacher") 
 radar$Q163_2 <- recode_factor(radar$Q163_2, "1" = "Doctor or Nurse")
 radar$Q163_3 <-recode_factor(radar$Q163_3, "1" = "Parent")
-radar$Q163_4 <-recode_factor(radar$Q163_4, "1" = "Extracurricular Adult") 
+radar$Q163_4 <-recode_factor(radar$Q163_4, "1" = "After-School Adult") 
 radar$Q163_5 <-recode_factor(radar$Q163_5, "1" = "Friend")
 radar$Q163_6 <-recode_factor(radar$Q163_6, "1" = "Neighbor")
 radar$Q163_7 <-recode_factor(radar$Q163_7, "1" = "Counselor")
-radar$Q163_8 <-recode_factor(radar$Q163_8, "1" = "Pastor, Rabbi, Clergy")
+radar$Q163_8 <-recode_factor(radar$Q163_8, "1" = "Religious Counselor")
 radar$Q163_9 <-recode_factor(radar$Q163_9, "1" = "Non-Parent Adult Relative") 
 radar$Q163_10 <-recode_factor(radar$Q163_10, "1" = "Sibling")
 radar$Q163_11 <-recode_factor(radar$Q163_11, "1" = "Cousin or Non-Adult Relative")
 radar$Q163_12 <-recode_factor(radar$Q163_12, "1" = "Other")
-radar$Q163_13 <-recode_factor(radar$Q163_13, "1" = "I choose not to answer")
+radar$Q163_13 <-recode_factor(radar$Q163_13, "1" = NA_character_)
   
 radar <- radar %>% 
   select(c("Adverse Childhood Experiences", "Physical Abuse", "Sexual Abuse", PATOTR, SATOT, ACETOT, Q28, loc, Q12, starts_with("Q163_"), starts_with("Q3_"))) %>% 
@@ -482,19 +503,20 @@ radar <- radar %>%
 ggplot(radar, aes(x = told)) +
   geom_bar(aes(fill = loc), width = 1, color = "white") +
   coord_polar() + 
-  scale_fill_manual(values = c("brown", "#31a354")) +
+  scale_fill_manual(values = c("darkseagreen1", "darkseagreen4")) +
   #scale_x_discrete(labels = wrap_format(10)) +
   labs(title = "Students are Most Likely to Disclose to Friends",
        subtitle = "Regardless of Foster Care Placement",
        y = NULL,
        x = NULL,
-       fill = "Foster Care") +
+       fill = NULL) +
   theme(
     panel.background = element_blank(),
     panel.grid.major = element_line("grey90"),
     axis.ticks = element_blank(),
-    axis.text = element_text(),
-    axis.text.x = element_text(size = 8, color = "sienna2")
+    axis.text = element_blank(),
+    axis.text.x = element_text(size = 8, color = "darkgreen"),
+    legend.position = "bottom"
   )
 
 ```
