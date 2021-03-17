@@ -3,51 +3,84 @@ title: "Oregon Child Abuse Prevalence Study"
 subtitle: "Pilot"
 output: 
   flexdashboard::flex_dashboard:
-    theme: united
+    theme: sandstone
     source_code: embed
     vertical_layout: fill
     horizontal_layout: fill
+    
 ---
 
 
-<style type="text/css">
 
-.chart-title {  /* chart_title  */
-   font-size: 15px;
-   font-family: font-family: 'Sen', sans-serif;
-
-</style>
-
-
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, fig.height = 4}
 library(flexdashboard)
+library(here)
+library(tidyverse)
+library(rio)
+library(dplyr)
+library(forcats)
+library(ggpubr)
+
+d <- import(here("d", "OCAPS_Pilot_1.23.19.sav")) %>% 
+  characterize()
+dq <- import(here("d", "ocaps_qualtrics.csv"))
+
+dq$ID <- seq.int(nrow(dq))
+
+dq <- dq %>% 
+  mutate_at(vars(Q3:Q102), as.factor) %>% 
+  mutate(loc = forcats::fct_recode(Q240, Rural = "Oakridge High School", Urban = "Early College & Career Options (ECCO)", Urban = "Sheldon High School", Urban  = "North Eugene High School", Rural = "Siuslaw High School", Rural = "Cottage Grove High School", Rural = "McKenzie High School", Urban = "Springfield High School", Urban = "Kalapuya High School", Urban = "Willamette High School", Rural = "Junction City High School", Urban = "Academy of Arts & Academics (A3), Springfield School District")) %>% 
+  mutate(age = forcats::fct_recode(Q11, `16` = "16 years old", `17` = "17 years old", `18+` = "18 years old or more"))
+
+level1 <- c(`1` = "Yes", `0` = "No", `0` = "I choose not to answer", `0` = "<NA>")
+
+dq1 <- dq %>% 
+  mutate_at(.vars = vars(Q120, Q123, Q126, Q129, Q132, Q135, Q138, Q141, Q144, Q147, Q153, Q162, Q165, Q174, Q346),
+            .funs = forcats::fct_recode, 
+            !!!level1)
+
+dq1 <- dq1 %>% 
+  mutate_at(.vars = vars(Q120, Q123, Q126, Q129, Q132, Q135, Q138, Q141, Q144, Q147, Q153, Q162, Q165, Q174, Q346),
+            .funs = forcats::fct_explicit_na, 
+            na_level = "0")
+
+dq1$Q120 = as.numeric(as.character(dq1$Q120))
+dq1$Q123 = as.numeric(as.character(dq1$Q123))
+dq1$Q126 = as.numeric(as.character(dq1$Q126))
+dq1$Q129 = as.numeric(as.character(dq1$Q129))
+dq1$Q132 = as.numeric(as.character(dq1$Q132))
+dq1$Q132 = as.numeric(as.character(dq1$Q132))
+dq1$Q135 = as.numeric(as.character(dq1$Q135))
+dq1$Q138 = as.numeric(as.character(dq1$Q138))
+dq1$Q141 = as.numeric(as.character(dq1$Q141))
+dq1$Q144 = as.numeric(as.character(dq1$Q144))
+dq1$Q147 = as.numeric(as.character(dq1$Q147))
+dq1$Q153 = as.numeric(as.character(dq1$Q153))
+dq1$Q162 = as.numeric(as.character(dq1$Q162))
+dq1$Q165 = as.numeric(as.character(dq1$Q165))
+dq1$Q174 = as.numeric(as.character(dq1$Q174))
+dq1$Q346 = as.numeric(as.character(dq1$Q346))
+
+
+dq1 <- dq1 %>% 
+  group_by(ID) %>% 
+  mutate(pa = sum(Q123, Q126, Q129, Q132, Q135, Q138, Q141, Q144, Q147, Q153, Q162, Q165, Q174))
+
+
 ```
 
-Data Description {.sidebar}
+What is OCAPS?
 =============================
 
-**Data Source**
-
-The plots and statistics displayed on this dashboard are generated from the Oregon Child Abuse Prevalence Study (OCAPS) Pilot, conducted with 216 high schoolers in 5 Lane County (OR) school districts in 2019.
-
-**The OCAPS pilot surveys students to assess students' current experiences of abuse, harrassment, and social support.**
-
-[Akhila Nekkanti](https://ctn.uoregon.edu/profile/akhilan) created this dashboard in R using the [flexdashboard](https://rmarkdown.rstudio.com/flexdashboard/index.html) package.
-
-Home {data-orientation=rows} 
-=========================
-
-
-Row 
+Column {data-width=400}
 ----------------------------------------------
 
 ### Click the image below to learn more about the Oregon Child Abuse Prevalence Study Pilot, conducted by the University of Oregon's Center for Prevention of Abuse and Neglect. {.no-title}
 
-[![](https://90by30.com/sites/90by30.com/files/uploads/Facebook%20-%20Know%20More.png)](https://90by30.com/sites/90by30.com/files/resources/OCAPS%20Pilot%2010%20page%20Research%20Summary.pdf){target="_blank"}
+[![](grad.png)](https://olis.oregonlegislature.gov/liz/2020R1/Downloads/CommitteeMeetingDocument/211979) {fig.width=5px}
 
 
-
-Row {data-height=650}
+Column
 -------------------------------
 ### Background
 
@@ -56,3 +89,413 @@ Row {data-height=650}
 Policymakers, funders, advocates and people working to support children and families overwhelmingly agree that the best **existing measurement significantly under-reports the actual abuse and neglect experienced by Oregon children and youth**. 
 
 There is a need for a better, more accurate approach. The [UO Center for the Prevention of Abuse and Neglect](https://90by30.com/who-we-are/center-prevention-abuse-and-neglect) spent two years researching how other states and countries measure child abuse prevalence rates and then another year in developing and implementing a pilot study to determine whether a safe and more accurate method could work in Oregon. The Ford Family Foundation and Meyer Memorial Trust supported the research, development, and piloting stages of OCAPS. The CPAN research team has now completed an OCAPS pilot study and we are now before the Oregon Legislature, partnering with the Department of Human Services and Oregon Department of Education to fund OCAPS statewide. To investigate whether such a study is viable, several legislators in 2017 recommended that CPAN pilot the study and bring those results to the Legislature. This report is the result of those efforts. 
+
+
+
+What are students saying? {.storyboard}
+=============================
+
+### **64%** of students report at least one experience of physical abuse.{data-commentary-width=600}
+
+
+
+### Abuse experiences may be related to missing school.{data-commentary-width=600}
+```{r}
+
+colors <- c("#FFDB6D", "#C4961A", "#F4EDCA", 
+                "#D16103", "#C3D7A4", "#52854C", "#4E84C4", "#293352")
+
+days <- c(`0` = "None",
+                  `1` = "1-2 days",
+                  `2` = "3-5 days",
+                  `3` = "6-10 days",
+                  `4` = "11-15 days",
+                  `5` = "16 or more days")  
+
+d <- d %>% 
+  mutate(dmiss = forcats::fct_recode(Q18, !!!days)) %>% 
+  mutate(dmiss = as.numeric(dmiss), drop(NA)) %>% 
+  mutate(PATOTR = as.numeric(PATOTR), drop(NA))
+                                    
+
+d <- d %>% 
+  mutate_at(vars(Q1:PATOTR), as.factor) %>% 
+  mutate_at(.vars = vars(Q87A, Q88A, Q89A, Q90A, Q91A, Q92A, Q93A, Q94A, Q95A, Q97A, Q100A, Q101A, Q104A),
+            .funs = forcats::fct_recode, 
+            !!!level1)
+
+d$Q87A = as.numeric(as.character(d$Q87A))
+d$Q88A = as.numeric(as.character(d$Q88A))
+d$Q89A = as.numeric(as.character(d$Q89A))
+d$Q90A = as.numeric(as.character(d$Q90A))
+d$Q91A = as.numeric(as.character(d$Q91A))
+d$Q92A = as.numeric(as.character(d$Q92A))
+d$Q93A = as.numeric(as.character(d$Q93A))
+d$Q94A = as.numeric(as.character(d$Q94A))
+d$Q95A = as.numeric(as.character(d$Q95A))
+d$Q97A = as.numeric(as.character(d$Q97A))
+d$Q100A = as.numeric(as.character(d$Q100A))
+d$Q101A = as.numeric(as.character(d$Q101A))
+d$Q104A = as.numeric(as.character(d$Q104A))
+
+d <- d %>% 
+  group_by(as.factor(V1)) %>% 
+  mutate(pa = sum(Q87A, Q88A, Q89A, Q90A, Q91A, Q92A, Q93A, Q94A, Q95A, Q97A, Q100A, Q101A, Q104A)) %>% 
+  ungroup()
+
+
+
+d <- d %>% 
+  mutate(loc = fct_recode(Q1, Rural = "Oakridge High School", Urban = "Early College & Career Options (ECCO)", Urban = "Sheldon High School", Urban  = "South Eugene High School", Rural = "Siuslaw High School", Rural = "Cottage Grove High School", Rural = "McKenzie High School", Urban = "Springfield High School", Urban = "Kalapuya High School", Urban = "Willamette High School", Rural = "Junction City High School", Urban = "Academy of Arts & Academics (A3), Springfield School District"))
+
+
+d %>% 
+  filter(Q87A == 1 |
+         Q88A == 1 | 
+        Q89A == 1 |
+        Q90A == 1 |
+        Q91A == 1 |
+        Q92A == 1 |
+        Q93A == 1 |
+        Q94A == 1 |
+        Q95A == 1 |
+        Q97A ==1 |
+        Q100A == 1 |
+        Q101A == 1 |
+        Q104A == 1) %>% 
+  mutate(Q18 = factor(Q18, levels = c("1-2 days", "3-5 days", "6-10 days", "11-15 days", "16 or more days", "None","I choose not to answer")))  %>% 
+ggplot(aes(Q18, fill = loc)) +
+  geom_bar() +
+  geom_text(stat = 'count', aes(label = ..count..), hjust =-.5) +
+  scale_fill_manual(values = colors) +
+  coord_flip() +
+  facet_wrap(~loc) +
+  theme(plot.title = element_text(size = 15),
+         plot.subtitle = element_text(size = 5),
+         panel.background = element_blank(),
+         panel.grid.major.y = element_line("grey90"),
+         axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+         axis.text.y = element_text(size = 12),
+         axis.text.x=element_blank(),
+         axis.ticks.x=element_blank(),
+         legend.position = "none",
+         legend.title = element_blank(),
+         legend.text = element_text(size = 5)) +
+  labs(
+    title = str_wrap("Of those who experience at least one type of abuse, 88% missed school", width = 45))
+
+# d <- d %>% 
+#   mutate(Q87A = factor)
+# 
+# d %>% 
+#   filter(Q87A != 1 |
+#          Q88A != 1 | 
+#         Q89A != 1 |
+#         Q90A != 1 |
+#         Q91A != 1 |
+#         Q92A != 1 |
+#         Q93A != 1 |
+#         Q94A != 1 |
+#         Q95A != 1 |
+#         Q97A !=1 |
+#         Q100A != 1 |
+#         Q101A != 1 |
+#         Q104A != 1) %>% 
+#   mutate(Q18 = factor(Q18, levels = c("1-2 days", "3-5 days", "6-10 days", "11-15 days", "16 or more days", "None","I choose not to answer")))  %>% 
+# ggplot(aes(Q18, fill = loc)) +
+#   geom_bar() +
+#   geom_text(stat = 'count', aes(label = ..count..), hjust =-.5) +
+#   scale_fill_manual(values = colors) +
+#   coord_flip() +
+#   #facet_wrap(~loc) +
+#   theme(plot.title = element_text(size = 15),
+#          plot.subtitle = element_text(size = 5),
+#          panel.background = element_blank(),
+#          panel.grid.major.y = element_line("grey90"),
+#          axis.title.x=element_blank(),
+#          axis.title.y=element_blank(),
+#          axis.text.y = element_text(size = 12),
+#          axis.text.x=element_blank(),
+#          axis.ticks.x=element_blank(),
+#          legend.position = "none",
+#          legend.title = element_blank(),
+#          legend.text = element_text(size = 5)) +
+#   labs(
+#     title = str_wrap("Of those who experience at least one type of abuse, % missed school", width = 45))
+  
+school <- d %>% 
+  select(Q17, Q18, PATOTR, loc)
+
+school1 <- school %>% 
+drop_na() %>% 
+  filter (Q17 != "I choose not to answer" |
+            Q18 != "I choose not to answer") %>% 
+  count(Q17, Q18)
+
+```
+
+
+```{r}
+
+x <- dq1 %>% 
+  filter(Q124 != "Not in the past year" |
+           Q127 != "Not in the past year" |
+         Q130  != "Not in the past year" |
+      Q133 != "Not in the past year"|
+      Q136 != "Not in the past year"|
+      Q139 != "Not in the past year"|
+      Q142 != "Not in the past year"|
+      Q145 != "Not in the past year"|
+      Q148 != "Not in the past year"|
+      Q154 != "Not in the past year"|
+      Q163 != "Not in the past year"|
+      Q166 != "Not in the past year"|
+      Q175 != "Not in the past year") %>% 
+  select(ID, pa, loc, age, Q13)
+  
+
+x <- x %>% 
+  mutate(gen = fct_collapse(Q13, 
+        "Non-binary" = c("Gender fluid/not exclusively male or female", "Gender nonconforming/Genderqueer"),
+       "Unsure" = c("I am not sure of my gender identity", "Male,I am not sure of my gender identity", "Male,I do not know what this question is asking"),
+        "Male" = c("Male,Transgender", "Male"),
+       "Female" = "Female"))
+
+```
+
+***
+
+```{r}
+
+ggpubr::ggballoonplot(school1, fill = "value") + ggplot2::scale_fill_gradient(low = "yellow", high = "red") +
+  theme_minimal() +
+  labs(
+    title= str_wrap("Overall, absences aren't related to student reported grades", width=30)
+  )
+
+```
+
+
+
+### 
+
+```{r}
+
+liklevel <- c('Never', 'Almost Never', 'Sometimes', 'A lot', 'I choose not to answer')
+
+parent_lik <- d %>% 
+  filter(Q87A == 1 |
+         Q88A == 1 | 
+        Q89A == 1 |
+        Q90A == 1 |
+        Q91A == 1 |
+        Q92A == 1 |
+        Q93A == 1 |
+        Q94A == 1 |
+        Q95A == 1 |
+        Q97A ==1 |
+        Q100A == 1 |
+        Q101A == 1 |
+        Q104A == 1) %>% 
+  select(Q119,
+Q120,
+Q121,
+Q122,
+Q123,
+Q124,
+Q125,
+Q126,
+Q127,
+Q128,
+Q129,
+Q130,
+Q131,
+Q132,
+Q133,
+Q134,
+Q135,
+Q136) %>% 
+  drop_na() %>% 
+  mutate(across(cols = starts_with("Q"), factor(levels = liklevel, ordered = TRUE)))
+
+
+parent_liklong <- parent_lik %>% 
+  rename("Make sure you see a doctor or other health care provider when you need one." = "Q119",
+         "Help you when you have problems." = "Q120",
+         "Want to know what you're doing if you're not at home." = "Q121",
+         "Take an interest in the kind of friends you have." = "Q122",
+        "When you were young (13 or under) made sure that you bathed or showered regularly." = "Q123",
+        "Keep the house clean." = "Q124",
+        "Give you enough clothes to keep you warm." = "Q125",
+        "Take care of you when you're sick." = "Q126",
+        "Do things with you just for fun." = "Q127",
+        "Take an interest in your activities or hobbies." = "Q128",
+        "Comfort you if you're upset." = "Q129",
+        "Help you to do your best." = "Q130",
+        "Praise you." = "Q131",
+        "Tell you they love you." = "Q132",
+        "Care if you get into trouble at school." = "Q133",
+        "Care if you do bad things, like shoplifting." = "Q134",
+        "Make sure you have somewhere safe to play." = "Q135",
+        "Make sure you always go to school." = "Q136") %>% 
+  pivot_longer(
+    cols = contains("."),
+    values_to = "category",
+    names_to = "question",
+    values_drop_na = TRUE
+    ) %>% 
+  group_by(question, category) %>% 
+  add_tally() 
+
+ sum_table <- parent_liklong %>%
+  filter(category != "I choose not to answer") %>% 
+  select(question, n, category) %>% 
+   mutate(question = stringr::str_wrap(question, width = 35)) %>% 
+  group_by(question) %>%
+  mutate(total = sum(n)) %>% 
+  ungroup() %>% 
+  mutate(pct = (n/total))
+ 
+ 
+sum_table1 <- sum_table %>% 
+  mutate(pct = pct* -1) %>% 
+  filter(category == "Never" |
+           category == "Almost never") %>% 
+  mutate(category = factor(category, levels = c("Never", "Almost never")))
+ 
+
+sum_table %>%
+  filter(category == "A lot" |
+           category == "Sometimes") %>%
+  group_by(question) %>% 
+  mutate(totagree = sum(pct)) %>% 
+  ungroup() %>% 
+ggplot(aes(question, pct)) + 
+  geom_col(aes(fill = category)) +
+  # annotate("text", x = 3, y = 115, label = wrapper("88%", width = 10), size = 6) +
+  # annotate("text", x = 3, y = -20, label = wrapper("12%", width = 10), size = 6) +
+  # annotate("text", x = 2, y = 115, label = wrapper("82%", width = 10), size = 6) +
+  # annotate("text", x = 2, y = -20, label = wrapper("18%", width = 10), size = 6) +
+  # annotate("text", x = 1, y = 115, label = wrapper("80%", width = 10), size = 6) +
+  # annotate("text", x = 1, y = -20, label = wrapper("20%", width = 10), size = 6) +
+  geom_col(aes(fill = category), data = sum_table1) +
+  scale_fill_manual(values = c("#a6cee3","#b2df8a","#1f78b4","#33a02c")) +
+  coord_flip() +
+  #scale_y_discrete(limits=c("Never", "Almost never", "Sometimes", "A lot")) +
+  #scale_x_discrete(labels = wrap_format(20)) + 
+  geom_abline(aes(intercept = 0, slope = 0), 
+               color = "grey40",
+               linetype = 2) +
+  ylim(-0.25, 1) +
+  labs(title = str_wrap("Students Report on their Parents' Engagement", width = 30),
+        y = NULL,
+        subtitle = str_wrap("Among those who experienced at least one type of physical abuse, many report their parents are engaging and present.", width = 40)
+  ) +
+  theme(
+         plot.title = element_text(size = 15),
+         plot.subtitle = element_text(size = 10),
+         panel.background = element_blank(),
+         panel.grid.major.y = element_line("grey90"),
+         axis.title.x=element_blank(),
+         axis.title.y=element_blank(),
+         axis.text.y = element_text(size = 10),
+         axis.text.x=element_blank(),
+         axis.ticks.x=element_blank(),
+         legend.position = "bottom",
+         legend.title = element_blank(),
+         legend.text = element_text(size = 10),
+         aspect.ratio = 8/10)
+  
+
+```
+
+***
+
+
+### Mental Health
+
+```{r}
+
+dq %>% 
+  ggplot(aes(as.factor(Q56))) +
+  geom_bar() +
+  facet_grid(~age) +
+  labs(
+    title = "Suicidality in the past 12 months")
+
+dq %>% 
+  ggplot(aes(as.factor(Q55))) +
+  geom_bar() +
+  facet_grid(~age) +
+  labs(title = "Depressed")
+
+```
+
+***
+
+### School {data-commentary-width=400}
+
+```{r}
+
+radar <- d %>% 
+  group_by(loc) %>% 
+   select(PATOTR, SATOT, ACETOT, Q28, loc, Q12, starts_with("Q163_"), starts_with("Q3_")) %>% 
+  mutate(
+    'Adverse Childhood Experiences' = mean(ACETOT),
+    'Physical Abuse' = mean(PATOTR),
+    'Sexual Abuse' = mean(SATOT))
+
+
+radar$Q163_1 <- recode_factor(radar$Q163_1, "1" = "Teacher") 
+radar$Q163_2 <- recode_factor(radar$Q163_2, "1" = "Doctor or Nurse")
+radar$Q163_3 <-recode_factor(radar$Q163_3, "1" = "Parent")
+radar$Q163_4 <-recode_factor(radar$Q163_4, "1" = "Extracurricular Adult") 
+radar$Q163_5 <-recode_factor(radar$Q163_5, "1" = "Friend")
+radar$Q163_6 <-recode_factor(radar$Q163_6, "1" = "Neighbor")
+radar$Q163_7 <-recode_factor(radar$Q163_7, "1" = "Counselor")
+radar$Q163_8 <-recode_factor(radar$Q163_8, "1" = "Pastor, Rabbi, Clergy")
+radar$Q163_9 <-recode_factor(radar$Q163_9, "1" = "Non-Parent Adult Relative") 
+radar$Q163_10 <-recode_factor(radar$Q163_10, "1" = "Sibling")
+radar$Q163_11 <-recode_factor(radar$Q163_11, "1" = "Cousin or Non-Adult Relative")
+radar$Q163_12 <-recode_factor(radar$Q163_12, "1" = "Other")
+radar$Q163_13 <-recode_factor(radar$Q163_13, "1" = "I choose not to answer")
+  
+radar <- radar %>% 
+  select(c("Adverse Childhood Experiences", "Physical Abuse", "Sexual Abuse", PATOTR, SATOT, ACETOT, Q28, loc, Q12, starts_with("Q163_"), starts_with("Q3_"))) %>% 
+  pivot_longer(
+    cols = c("Adverse Childhood Experiences", "Physical Abuse", "Sexual Abuse"),
+    names_to = "experience",
+    values_to = "mean_scores",
+    values_drop_na = FALSE)
+
+radar <- radar %>% 
+  pivot_longer(
+    cols = starts_with("Q163_"),
+    names_prefix = "Q163_",
+    names_to = "toss",
+    values_to = "told",
+    values_drop_na = TRUE
+)
+
+
+ggplot(radar, aes(x = told)) +
+  geom_bar(aes(fill = loc), width = 1, color = "white") +
+  coord_polar() + 
+  scale_fill_manual(values = c("brown", "#31a354")) +
+  #scale_x_discrete(labels = wrap_format(10)) +
+  labs(title = "Students are Most Likely to Disclose to Friends",
+       subtitle = "Regardless of Foster Care Placement",
+       y = NULL,
+       x = NULL,
+       fill = "Foster Care") +
+  theme(
+    panel.background = element_blank(),
+    panel.grid.major = element_line("grey90"),
+    axis.ticks = element_blank(),
+    axis.text = element_text(),
+    axis.text.x = element_text(size = 8, color = "sienna2")
+  )
+
+```
+
