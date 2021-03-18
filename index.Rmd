@@ -27,8 +27,12 @@ dq <- import(here("d", "ocaps_qualtrics.csv"))
 
 dq$ID <- seq.int(nrow(dq))
 
+# Or try this:
+# dq %>% 
+#   mutate(ID = row_number())
+
 dq <- dq %>% 
-  mutate_at(vars(Q3:Q102), as.factor) %>% 
+  mutate_at(vars(Q3:Q102), as.factor) %>% #new dyplr: mutate(across(c(Q3:Q102)), as.factor)
   mutate(loc = forcats::fct_recode(Q240, Rural = "Oakridge High School", Urban = "Early College & Career Options (ECCO)", Urban = "Sheldon High School", Urban  = "North Eugene High School", Rural = "Siuslaw High School", Rural = "Cottage Grove High School", Rural = "McKenzie High School", Urban = "Springfield High School", Urban = "Kalapuya High School", Urban = "Willamette High School", Rural = "Junction City High School", Urban = "Academy of Arts & Academics (A3), Springfield School District")) %>% 
   mutate(age = forcats::fct_recode(Q11, `16` = "16 years old", `17` = "17 years old", `18+` = "18 years old or more"))
 
@@ -37,7 +41,7 @@ level1 <- c(`1` = "Yes", `0` = "No", `0` = "I choose not to answer", `0` = "<NA>
 dq1 <- dq %>% 
   mutate_at(.vars = vars(Q120, Q123, Q126, Q129, Q132, Q135, Q138, Q141, Q144, Q147, Q153, Q162, Q165, Q174, Q346),
             .funs = forcats::fct_recode, 
-            !!!level1)
+            !!!level1) 
 
 dq1 <- dq1 %>% 
   mutate_at(.vars = vars(Q120, Q123, Q126, Q129, Q132, Q135, Q138, Q141, Q144, Q147, Q153, Q162, Q165, Q174, Q346),
@@ -61,6 +65,9 @@ dq1$Q165 = as.numeric(as.character(dq1$Q165))
 dq1$Q174 = as.numeric(as.character(dq1$Q174))
 dq1$Q346 = as.numeric(as.character(dq1$Q346))
 
+# This should work instead of lines 51-66
+dq1 <- dq1 %>% 
+  mutate(across(c(Q120, Q123, Q126, Q129, Q132, Q135, Q138, Q141, Q144, Q147, Q153, Q162, Q165, Q174, Q346), ~as.numeric(as.character(.))))
 
 dq1 <- dq1 %>% 
   group_by(ID) %>% 
@@ -88,7 +95,7 @@ Column {data-width=700}
 
 Policymakers, funders, advocates and people working to support children and families overwhelmingly agree that the best **existing measurement significantly under-reports the actual abuse and neglect experienced by Oregon children and youth**. 
 
-There is a need for a better, more accurate approach. The [UO Center for the Prevention of Abuse and Neglect](https://90by30.com/who-we-are/center-prevention-abuse-and-neglect) spent two years researching how other states and countries measure child abuse prevalence rates and then another year in developing and implementing a pilot study to determine whether a safe and more accurate method could work in Oregon. The Ford Family Foundation and Meyer Memorial Trust supported the research, development, and piloting stages of OCAPS. The CPAN research team has now completed an OCAPS pilot study and we are now before the Oregon Legislature, partnering with the Department of Human Services and Oregon Department of Education to fund OCAPS statewide. To investigate whether such a study is viable, several legislators in 2017 recommended that CPAN pilot the study and bring those results to the Legislature. This report is the result of those efforts. 
+There is a need for a better, more accurate approach. The [UO Center for the Prevention of Abuse and Neglect](https://90by30.com/who-we-are/center-prevention-abuse-and-neglect) <!-- this link is not working --> spent two years researching how other states and countries measure child abuse prevalence rates and then another year in developing and implementing a pilot study to determine whether a safe and more accurate method could work in Oregon. The Ford Family Foundation and Meyer Memorial Trust supported the research, development, and piloting stages of OCAPS. The CPAN research team has now completed an OCAPS pilot study and we are now before the Oregon Legislature, partnering with the Department of Human Services and Oregon Department of Education to fund OCAPS statewide. To investigate whether such a study is viable, several legislators in 2017 recommended that CPAN pilot the study and bring those results to the Legislature. This report is the result of those efforts. 
 
 
 
@@ -110,9 +117,9 @@ days <- c(`0` = "None",
                   `5` = "16 or more days")  
 
 d <- d %>% 
-  mutate(dmiss = forcats::fct_recode(Q18, !!!days)) %>% 
-  mutate(dmiss = as.numeric(dmiss), drop(NA)) %>% 
-  mutate(PATOTR = as.numeric(PATOTR), drop(NA))
+  mutate(dmiss = forcats::fct_recode(Q18, !!!days),
+         dmiss = as.numeric(dmiss), drop(NA),
+         PATOTR = as.numeric(PATOTR), drop(NA)) # you can add all htese to one mutate() function
                                     
 
 d <- d %>% 
@@ -121,19 +128,22 @@ d <- d %>%
             .funs = forcats::fct_recode, 
             !!!level1)
 
-d$Q87A = as.numeric(as.character(d$Q87A))
-d$Q88A = as.numeric(as.character(d$Q88A))
-d$Q89A = as.numeric(as.character(d$Q89A))
-d$Q90A = as.numeric(as.character(d$Q90A))
-d$Q91A = as.numeric(as.character(d$Q91A))
-d$Q92A = as.numeric(as.character(d$Q92A))
-d$Q93A = as.numeric(as.character(d$Q93A))
-d$Q94A = as.numeric(as.character(d$Q94A))
-d$Q95A = as.numeric(as.character(d$Q95A))
-d$Q97A = as.numeric(as.character(d$Q97A))
-d$Q100A = as.numeric(as.character(d$Q100A))
-d$Q101A = as.numeric(as.character(d$Q101A))
-d$Q104A = as.numeric(as.character(d$Q104A))
+# d$Q87A = as.numeric(as.character(d$Q87A))
+# d$Q88A = as.numeric(as.character(d$Q88A))
+# d$Q89A = as.numeric(as.character(d$Q89A))
+# d$Q90A = as.numeric(as.character(d$Q90A))
+# d$Q91A = as.numeric(as.character(d$Q91A))
+# d$Q92A = as.numeric(as.character(d$Q92A))
+# d$Q93A = as.numeric(as.character(d$Q93A))
+# d$Q94A = as.numeric(as.character(d$Q94A))
+# d$Q95A = as.numeric(as.character(d$Q95A))
+# d$Q97A = as.numeric(as.character(d$Q97A))
+# d$Q100A = as.numeric(as.character(d$Q100A))
+# d$Q101A = as.numeric(as.character(d$Q101A))
+# d$Q104A = as.numeric(as.character(d$Q104A))
+
+d <- d %>% 
+  mutate(across(c(Q87A, Q88A, Q89A, Q90A, Q91A, Q92A, Q93A, Q94A, Q95A, Q97A, Q100A, Q101A, Q104A), ~as.numeric(as.character(.))))
 
 d <- d %>% 
   group_by(as.factor(V1)) %>% 
@@ -141,7 +151,7 @@ d <- d %>%
   ungroup()
 
 
-
+# Do the school names need to be anonymized? If so, you can move this to your "d" folder.
 d <- d %>% 
   mutate(loc = fct_recode(Q1, Rural = "Oakridge High School", Urban = "Early College & Career Options (ECCO)", Urban = "Sheldon High School", Urban  = "South Eugene High School", Rural = "Siuslaw High School", Rural = "Cottage Grove High School", Rural = "McKenzie High School", Urban = "Springfield High School", Urban = "Kalapuya High School", Urban = "Willamette High School", Rural = "Junction City High School", Urban = "Academy of Arts & Academics (A3), Springfield School District"))
 
@@ -160,7 +170,8 @@ d %>%
         Q100A == 1 |
         Q101A == 1 |
         Q104A == 1) %>% 
-  mutate(Q18 = factor(Q18, levels = c("1-2 days", "3-5 days", "6-10 days", "11-15 days", "16 or more days", "None","I choose not to answer")))  %>% 
+  mutate(Q18 = factor(Q18, levels = c("1-2 days", "3-5 days", "6-10 days", "11-15 days", "16 or more days", "None","I choose not to answer")),
+         Q18 = fct_rev(Q18))  %>% # This should display the levels in the way you specify above
 ggplot(aes(Q18, fill = loc)) +
   geom_bar() +
   geom_text(stat = 'count', aes(label = ..count..), hjust =-.5) +
@@ -180,7 +191,8 @@ ggplot(aes(Q18, fill = loc)) +
          legend.title = element_blank(),
          legend.text = element_text(size = 5)) +
   labs(
-    title = str_wrap("Of those who experience at least one type of abuse, 88% missed school", width = 55))
+    title = str_wrap("Of those who experience at least one type of abuse, 88% missed school", width = 55)) +
+  theme(plot.title.position = "plot") # I am hoping this left-justifies the title
 
 # d <- d %>% 
 #   mutate(Q87A = factor)
@@ -226,7 +238,7 @@ school <- d %>%
 
 school1 <- school %>% 
 drop_na() %>% 
-  filter (Q17 != "I choose not to answer" |
+  filter(Q17 != "I choose not to answer" |
             Q18 != "I choose not to answer") %>% 
   count(Q17, Q18)
 
@@ -236,19 +248,22 @@ drop_na() %>%
 ```{r}
 
 x <- dq1 %>% 
-  filter(Q124 != "Not in the past year" |
-           Q127 != "Not in the past year" |
-         Q130  != "Not in the past year" |
-      Q133 != "Not in the past year"|
-      Q136 != "Not in the past year"|
-      Q139 != "Not in the past year"|
-      Q142 != "Not in the past year"|
-      Q145 != "Not in the past year"|
-      Q148 != "Not in the past year"|
-      Q154 != "Not in the past year"|
-      Q163 != "Not in the past year"|
-      Q166 != "Not in the past year"|
-      Q175 != "Not in the past year") %>% 
+  # See if the code below works. You can use "if_all" or "if_any" and I think you wanted "if_all"
+  filter(if_all(c(Q124, Q127, Q130, Q133, Q136, Q139, Q142, 
+                  Q145, Q148, Q15, Q163, Q166, Q175), ~ .x != "Not in the past year")) %>% 
+  # filter(Q124 != "Not in the past year" |
+  #          Q127 != "Not in the past year" |
+  #        Q130  != "Not in the past year" |
+  #     Q133 != "Not in the past year"|
+  #     Q136 != "Not in the past year"|
+  #     Q139 != "Not in the past year"|
+  #     Q142 != "Not in the past year"|
+  #     Q145 != "Not in the past year"|
+  #     Q148 != "Not in the past year"|
+  #     Q154 != "Not in the past year"|
+  #     Q163 != "Not in the past year"|
+  #     Q166 != "Not in the past year"|
+  #     Q175 != "Not in the past year") %>% 
   select(ID, pa, loc, age, Q13)
   
 
@@ -265,16 +280,19 @@ x <- x %>%
 
 
 ```{r}
+#You want to reorder the levels in this plot to match the plot that is adjacent to it. I like fct_relevel() to just reorder manually.
 
-ggpubr::ggballoonplot(school1, fill = "value") + ggplot2::scale_fill_gradient(low = "yellow", high = "red") +
+ggpubr::ggballoonplot(school1, fill = "value") + 
+  ggplot2::scale_fill_gradient(low = "yellow", high = "red") +
   theme(axis.text.x = element_text(angle = 45),
-        legend.position = "none")+
+        legend.position = "none") +
   labs(
     title= str_wrap("Overall, absences aren't related to student reported grades", width=30),
     subtitle = "Larger circles indicate more students.",
-    y = "Missed Days of School",
+    y = "Missed Days of School", # I don't see the x and y labels in the figure
     x = "Grades"
-  )
+  ) +
+  theme(plot.title.position = "plot") # I am hoping this left-justifies the title
 
 ```
 
@@ -286,7 +304,7 @@ ggpubr::ggballoonplot(school1, fill = "value") + ggplot2::scale_fill_gradient(lo
 liklevel <- c('Never', 'Almost Never', 'Sometimes', 'A lot', 'I choose not to answer')
 
 parent_lik <- d %>% 
-  filter(Q87A == 1 |
+  filter(Q87A == 1 | #see the filter code on line 252
          Q88A == 1 | 
         Q89A == 1 |
         Q90A == 1 |
@@ -318,7 +336,7 @@ Q134,
 Q135,
 Q136) %>% 
   drop_na() %>% 
-  mutate(across(cols = starts_with("Q"), factor(levels = liklevel, ordered = TRUE)))
+  mutate(across(cols = starts_with("Q"), factor(levels = liklevel, ordered = TRUE))) #You DO know of the across() function, nice job!
 
 
 parent_liklong <- parent_lik %>% 
@@ -341,7 +359,7 @@ parent_liklong <- parent_lik %>%
         "Make sure you have somewhere safe to play." = "Q135",
         "Make sure you always go to school." = "Q136") %>% 
   pivot_longer(
-    cols = contains("."),
+    cols = contains("."), #or you can use the everything() helper function
     values_to = "category",
     names_to = "question",
     values_drop_na = TRUE
@@ -386,7 +404,7 @@ ggplot(aes(question, pct)) +
   #scale_y_discrete(limits=c("Never", "Almost never", "Sometimes", "A lot")) +
   #scale_x_discrete(labels = wrap_format(20)) + 
   geom_abline(aes(intercept = 0, slope = 0), 
-               color = "grey40",
+               color = "grey40", # maybe try "white" here
                linetype = 2) +
   ylim(-0.25, 1) +
   labs(title = str_wrap("Students Report on their Parents' Engagement", width = 50),
@@ -395,6 +413,7 @@ ggplot(aes(question, pct)) +
   ) +
   theme(
          plot.title = element_text(size = 15),
+         plot.title.position = "plot",
          plot.subtitle = element_text(size = 10),
          panel.background = element_blank(),
          panel.grid.major.y = element_line("grey90"),
@@ -425,8 +444,9 @@ dq1 %>%
   labs(title = str_wrap("Of the students who experienced at least one type of abuse, those in urban schools are more likely to have considered suicide.", width = 50),
        y = "Number of Students",
        x = "Have Students Considered Suicidality?") +
-  theme(axis.text.x = element_text(angle = 90),
+  theme(axis.text.x = element_text(angle = 45), #maybe easier to read at an angle?
         legend.position = "none",
+        plot.title.position = "plot",
         panel.background = element_blank()) +
   scale_fill_manual(values = c("tomato1", "tomato4")) 
 
@@ -444,8 +464,9 @@ dq1 %>%
 labs(title = str_wrap("Of the students who experienced at least one type of abuse, those in urban schools are more likely to feel depressed.", width = 50),
        y = "Number of Students",
        x = "Are Students Depressed?") +
-  theme(axis.text.x = element_text(angle = 90),
+  theme(axis.text.x = element_text(angle = 45), #maybe easier to read at an angle?
         legend.position = "none",
+        plot.title.position = "plot",
         panel.background = element_blank()) +
   scale_fill_manual(values = c("goldenrod2", "goldenrod4")) 
 
@@ -455,7 +476,7 @@ labs(title = str_wrap("Of the students who experienced at least one type of abus
 
 ### Students are most likely to disclose their expereinces to their friends, regardless of Urban or Rural school status.
 
-```{r fig.width=5, fig.height=5}
+```{r fig.width=7, fig.height=7}
 
 radar <- d %>% 
   group_by(loc) %>% 
